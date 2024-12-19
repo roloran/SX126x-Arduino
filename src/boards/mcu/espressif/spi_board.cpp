@@ -11,7 +11,9 @@ void initSPI(void)
 	SPI_LORA.begin();
 	SPI_LORA.setHwCs(false);
 #else
+#ifdef SX126x_REINIT_SPI
 	SPI_LORA.begin(_hwConfig.PIN_LORA_SCLK, _hwConfig.PIN_LORA_MISO, _hwConfig.PIN_LORA_MOSI, _hwConfig.PIN_LORA_NSS);
+#endif
 #endif
 }
 #endif
