@@ -385,6 +385,9 @@ void _lora_task(void *pvParameters)
 		{
 			LOG_LIB("BRD", "LoRa task wakeup");
 			// Handle Radio events
+#ifndef DONT_USE_TDECK
+			while (digitalRead(12) == LOW) delay(1); // let TFT finish
+#endif
 			Radio.BgIrqProcess();
 		}
 	}

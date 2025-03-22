@@ -156,6 +156,9 @@ void SX126xWakeup(void)
 	dio3IsOutput = false;
 	BoardDisableIrq();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -174,6 +177,9 @@ void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
 {
 	SX126xCheckDeviceReady();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -197,6 +203,9 @@ void SX126xReadCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
 {
 	SX126xCheckDeviceReady();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -217,6 +226,9 @@ void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 {
 	SX126xCheckDeviceReady();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -244,6 +256,9 @@ void SX126xReadRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 {
 	SX126xCheckDeviceReady();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -272,6 +287,9 @@ void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 {
 	SX126xCheckDeviceReady();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -291,6 +309,9 @@ void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 {
 	SX126xCheckDeviceReady();
 
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 	digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 
 	SPI_LORA.beginTransaction(spiSettings);
@@ -338,6 +359,10 @@ static void SX126xDio3Control(bool state)
 
 		// Read 0x0580
 		SX126xWaitOnBusy();
+
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 		digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 		SPI_LORA.beginTransaction(spiSettings);
 		SPI_LORA.transfer(RADIO_READ_REGISTER);
@@ -447,6 +472,9 @@ static void SX126xDio3Control(bool state)
 	{
 		// Set DIO3 High
 		SX126xWaitOnBusy();
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 		digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 		SPI_LORA.beginTransaction(spiSettings);
 		SPI_LORA.transfer(RADIO_READ_REGISTER);
@@ -471,6 +499,9 @@ static void SX126xDio3Control(bool state)
 	{
 		// Set DIO3 Low
 		SX126xWaitOnBusy();
+#ifndef SX126x_DONT_USE_TDECK
+    digitalWrite(12, HIGH); // TFT CS
+#endif
 		digitalWrite(_hwConfig.PIN_LORA_NSS, LOW);
 		SPI_LORA.beginTransaction(spiSettings);
 		SPI_LORA.transfer(RADIO_READ_REGISTER);
