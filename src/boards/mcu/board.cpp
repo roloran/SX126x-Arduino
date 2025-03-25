@@ -374,6 +374,10 @@ uint32_t lora_rak13300_init(void)
 	return 1;
 }
 
+#ifndef DONT_USE_TDECK
+extern SemaphoreHandle_t highlander;
+#endif
+
 #if defined NRF52_SERIES || defined ESP32 || defined ARDUINO_RAKWIRELESS_RAK11300
 void _lora_task(void *pvParameters)
 {
@@ -387,8 +391,12 @@ void _lora_task(void *pvParameters)
 			// Handle Radio events
 #ifndef DONT_USE_TDECK
 			while (digitalRead(12) == LOW) delay(1); // let TFT finish
+      xSemaphoreTake(highlander, portMAX_DELAY);
 #endif
 			Radio.BgIrqProcess();
+#ifndef DONT_USE_TDECK
+      xSemaphoreGive(highlander);
+#endif
 		}
 	}
 }
