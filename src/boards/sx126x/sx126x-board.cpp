@@ -46,6 +46,8 @@ SPISettings spiSettings = SPISettings(2000000, MSBFIRST, SPI_MODE0);
 // No need to initialize DIO3 as output everytime, do it once and remember it
 bool dio3IsOutput = false;
 
+extern SemaphoreHandle_t highlander;
+
 void SX126xIoInit(void)
 {
 
@@ -156,6 +158,7 @@ void SX126xWakeup(void)
 	dio3IsOutput = false;
 	BoardDisableIrq();
 
+  // if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 #ifndef SX126x_DONT_USE_TDECK
     digitalWrite(12, HIGH); // TFT CS
 #endif
@@ -169,12 +172,14 @@ void SX126xWakeup(void)
 
 	// Wait for chip to be ready.
 	SX126xWaitOnBusy();
+  // xSemaphoreGive(highlander);
 
 	BoardEnableIrq();
 }
 
 void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
 {
+  if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 	SX126xCheckDeviceReady();
 
 #ifndef SX126x_DONT_USE_TDECK
@@ -197,10 +202,12 @@ void SX126xWriteCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
 	{
 		SX126xWaitOnBusy();
 	}
+  xSemaphoreGive(highlander);
 }
 
 void SX126xReadCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
 {
+  if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 	SX126xCheckDeviceReady();
 
 #ifndef SX126x_DONT_USE_TDECK
@@ -220,10 +227,12 @@ void SX126xReadCommand(RadioCommands_t command, uint8_t *buffer, uint16_t size)
 	digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
 
 	SX126xWaitOnBusy();
+  xSemaphoreGive(highlander);
 }
 
 void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 {
+  if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 	SX126xCheckDeviceReady();
 
 #ifndef SX126x_DONT_USE_TDECK
@@ -245,6 +254,7 @@ void SX126xWriteRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 	digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
 
 	SX126xWaitOnBusy();
+  xSemaphoreGive(highlander);
 }
 
 void SX126xWriteRegister(uint16_t address, uint8_t value)
@@ -254,6 +264,7 @@ void SX126xWriteRegister(uint16_t address, uint8_t value)
 
 void SX126xReadRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 {
+  if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 	SX126xCheckDeviceReady();
 
 #ifndef SX126x_DONT_USE_TDECK
@@ -274,6 +285,7 @@ void SX126xReadRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 	digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
 
 	SX126xWaitOnBusy();
+  xSemaphoreGive(highlander);
 }
 
 uint8_t SX126xReadRegister(uint16_t address)
@@ -285,6 +297,7 @@ uint8_t SX126xReadRegister(uint16_t address)
 
 void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 {
+  if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 	SX126xCheckDeviceReady();
 
 #ifndef SX126x_DONT_USE_TDECK
@@ -303,10 +316,12 @@ void SX126xWriteBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 	digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
 
 	SX126xWaitOnBusy();
+  xSemaphoreGive(highlander);
 }
 
 void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 {
+  if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 	SX126xCheckDeviceReady();
 
 #ifndef SX126x_DONT_USE_TDECK
@@ -326,6 +341,7 @@ void SX126xReadBuffer(uint8_t offset, uint8_t *buffer, uint8_t size)
 	digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
 
 	SX126xWaitOnBusy();
+  xSemaphoreGive(highlander);
 }
 
 void SX126xSetRfTxPower(int8_t power)
@@ -357,6 +373,7 @@ static void SX126xDio3Control(bool state)
 	{
 		// Configure DIO3 as output
 
+    if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 		// Read 0x0580
 		SX126xWaitOnBusy();
 
@@ -466,10 +483,12 @@ static void SX126xDio3Control(bool state)
 		digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
 
 		dio3IsOutput = true;
+    xSemaphoreGive(highlander);
 	}
 
 	if (state)
 	{
+    if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 		// Set DIO3 High
 		SX126xWaitOnBusy();
 #ifndef SX126x_DONT_USE_TDECK
@@ -494,9 +513,11 @@ static void SX126xDio3Control(bool state)
 		SPI_LORA.transfer(reg_0x0920 | 0x08);
 		SPI_LORA.endTransaction();
 		digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
+    xSemaphoreGive(highlander);
 	}
 	else
 	{
+    if (highlander) xSemaphoreTake(highlander, portMAX_DELAY);
 		// Set DIO3 Low
 		SX126xWaitOnBusy();
 #ifndef SX126x_DONT_USE_TDECK
@@ -521,6 +542,7 @@ static void SX126xDio3Control(bool state)
 		SPI_LORA.transfer(reg_0x0920 & ~0x08);
 		SPI_LORA.endTransaction();
 		digitalWrite(_hwConfig.PIN_LORA_NSS, HIGH);
+    xSemaphoreGive(highlander);
 	}
 }
 
